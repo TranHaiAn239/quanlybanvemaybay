@@ -3,21 +3,11 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
-                    </a>
-                </div>
+
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    @auth
-                        {{-- Link Dashboard cho người đã đăng nhập --}}
-                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                            {{ __('Dashboard') }}
-                        </x-nav-link>
-                    @endauth
+
 
                     @guest
                         {{-- Links cho khách --}}
@@ -82,11 +72,7 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            @auth
-                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                    {{ __('Dashboard') }}
-                </x-responsive-nav-link>
-            @endauth
+
 
             @guest
                 <x-responsive-nav-link :href="route('login')" :active="request()->routeIs('login')">
@@ -138,8 +124,9 @@
                     Trang chủ
                 </a>
 
-                <a href="#"
-                   class="px-3 py-2 rounded-md text-sm font-medium uppercase text-white hover:bg-blue-700">
+                <a href="{{ route('deal.index') }}"
+                   class="px-3 py-2 rounded-md text-sm font-medium uppercase
+                          {{ request()->routeIs('deal.*') ? 'bg-orange-500 text-white' : 'text-white hover:bg-blue-700' }}">
                     Săn vé rẻ
                 </a>
 
@@ -155,8 +142,9 @@
                     Kiểm tra đơn hàng
                 </a>
 
-                <a href="#"
-                   class="px-3 py-2 rounded-md text-sm font-medium uppercase text-white hover:bg-blue-700">
+                <a href="{{ route('support.index') }}"
+                    class="px-3 py-2 rounded-md text-sm font-medium uppercase
+                        {{ request()->routeIs('support.index') ? 'bg-orange-500 text-white' : 'text-white hover:bg-blue-700' }}">
                     Hỗ trợ
                 </a>
             </div>

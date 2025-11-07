@@ -8,6 +8,8 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\OrderHistoryController;
+use App\Http\Controllers\SupportController;
+use App\Http\Controllers\DealHunterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -71,11 +73,15 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/ho-tro', [SupportController::class, 'index'])->name('support.index');
+Route::get('/san-ve-re', [DealHunterController::class, 'index'])->name('deal.index');
+
 Route::get('/kiem-tra-don-hang', [OrderHistoryController::class, 'index'])
      ->name('order.history');
 
 Route::post('/huy-don-hang/{booking}', [OrderHistoryController::class, 'cancel'])
      ->name('order.cancel');
-
+Route::get('/in-hoa-don/{booking}', [OrderHistoryController::class, 'printInvoice'])
+     ->name('invoice.print');
 // Route cho file auth.php (Của Breeze)
 require __DIR__.'/auth.php';

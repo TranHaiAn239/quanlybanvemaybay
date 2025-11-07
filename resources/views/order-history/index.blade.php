@@ -68,8 +68,19 @@
                                 @endforeach
                             </div>
 
-                            @if ($booking->trang_thai == 'cho_thanh_toan')
-                            <div class="p-4 bg-gray-50 border-t flex justify-end">
+                            <div class="p-4 bg-gray-50 border-t flex justify-end space-x-3">
+
+                                {{-- NÚT IN HÓA ĐƠN (MỚI) --}}
+                                @if ($booking->trang_thai == 'da_thanh_toan')
+                                    <a href="{{ route('invoice.print', $booking->id) }}"
+                                       target="_blank"
+                                       class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow">
+                                        In Hóa Đơn
+                                    </a>
+                                @endif
+
+                                {{-- NÚT HỦY ĐƠN HÀNG (ĐÃ CÓ) --}}
+                                @if ($booking->trang_thai == 'cho_thanh_toan')
                                 <form action="{{ route('order.cancel', $booking->id) }}" method="POST"
                                       onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng {{ $booking->ma_booking }}?');">
                                     @csrf
@@ -78,8 +89,8 @@
                                         Hủy Đơn Hàng
                                     </button>
                                 </form>
+                                @endif
                             </div>
-                            @endif
                         </div>
                     @empty
                         {{-- Trường hợp người dùng chưa có đơn hàng nào --}}

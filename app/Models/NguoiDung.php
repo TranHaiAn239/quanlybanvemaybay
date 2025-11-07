@@ -5,8 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasName;
 
-class NguoiDung extends Authenticatable
+class NguoiDung extends Authenticatable implements FilamentUser, HasName
 {
     use HasFactory, Notifiable;
 
@@ -70,5 +72,14 @@ class NguoiDung extends Authenticatable
     public function thongBaos()
     {
         return $this->hasMany(ThongBao::class, 'id_nguoi_dung');
+    }
+    public function canAccessFilament(): bool
+    {
+        // Chỉ cho phép 'admin' và 'nhan_vien' truy cập
+        return in_array($this->vai_tro, ['admin', 'nhan_vien']);
+    }
+    public function getFilamentName(): string
+    {
+        return $this->ho_ten; // Trả về tên từ cột 'ho_ten'
     }
 }

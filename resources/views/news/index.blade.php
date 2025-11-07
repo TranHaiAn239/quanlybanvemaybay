@@ -35,9 +35,9 @@
                             @forelse ($baiViets as $baiViet)
                                 <div class="p-6 flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 hover:bg-gray-50">
                                     <div class="w-full md:w-1/3">
-                                        <img src="{{ $baiViet->hinh_anh_dai_dien ?? 'https://via.placeholder.com/300x200' }}"
-                                             alt="{{ $baiViet->tieu_de }}"
-                                             class="w-full h-48 object-cover rounded-lg">
+                                        <img src="{{ $baiViet->hinh_anh_dai_dien ? Storage::url($baiViet->hinh_anh_dai_dien) : 'https://via.placeholder.com/300x200' }}"
+                                            alt="{{ $baiViet->tieu_de }}"
+                                            class="w-full h-48 object-cover rounded-lg">
                                     </div>
 
                                     <div class="w-full md:w-2/3">

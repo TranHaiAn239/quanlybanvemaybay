@@ -77,4 +77,31 @@ class OrderHistoryController extends Controller
             return redirect()->route('order.history')->with('error', 'Có lỗi xảy ra, không thể hủy đơn hàng. Vui lòng thử lại.');
         }
     }
+
+    public function printInvoice(Booking $booking)
+    {
+        // --- BẢO MẬT ---
+        // 1. Kiểm tra xem booking này có đúng là của người dùng đang đăng nhập không
+        if ($booking->id_nguoi_dung !== Auth::id()) {
+            abort(403, 'Bạn không có quyền truy cập hóa đơn này.');
+        }
+
+        // --- LOGIC NGHIỆP VỤ ---
+        // 2. Chỉ cho phép in khi trạng thái là "Đã thanh toán"
+        if ($booking->trang_thai !== 'da_thanh_toan') {
+            return redirect()->route('order.history')->with('error', 'Không thể in hóa đơn cho đơn hàng chưa thanh toán.');
+        }
+
+        // 3. Tải tất cả dữ liệu cần thiết cho hóa đơn
+        $booking->load([
+            'nguoiDung', // Thông tin người đặt
+            'hoaDon',    // Thông tin hóa đơn (Mã HĐ, ngày...)
+            'ves.chuyenBay.sanBayDi', // Chi tiết vé: Chuyến bay
+            'ves.chuyenBay.sanBayDen',
+            'ves.thongTinNguoiDi' // Chi tiết vé: Tên hành khách
+        ]);
+
+        // 4. Trả về một view 'invoice.print' (chúng ta sẽ tạo ở Bước 4)
+        return view('invoice.print', compact('booking'));
+    }
 }

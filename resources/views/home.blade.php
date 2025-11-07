@@ -56,7 +56,7 @@
                                 <div class="mb-4">
                                     <select class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg p-3"
                                             id="san_bay_di" name="id_san_bay_di" required>
-                                        <option value="">Chọn nơi đi</option>
+                                        <option value="">Chọn điểm xuất phát</option>
                                         @foreach($sanBays as $sanBay)
                                             <option value="{{ $sanBay->id }}">{{ $sanBay->ten_san_bay }} ({{ $sanBay->ma_san_bay }})</option>
                                         @endforeach
@@ -67,7 +67,7 @@
                                 <div class="mb-4">
                                     <select class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg p-3"
                                             id="san_bay_den" name="id_san_bay_den" required>
-                                        <option value="">Chọn nơi đến</option>
+                                        <option value="">Chọn điểm đến</option>
                                         @foreach($sanBays as $sanBay)
                                             <option value="{{ $sanBay->id }}">{{ $sanBay->ten_san_bay }} ({{ $sanBay->ma_san_bay }})</option>
                                         @endforeach
@@ -314,13 +314,13 @@
                     {{-- Card tin tức viết bằng Tailwind --}}
                     <div class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
                         <div>
-                            <img src="{{ $baiViet->hinh_anh_dai_dien ?? 'https://via.placeholder.com/400x250' }}"
-                                 alt="{{ $baiViet->tieu_de }}" class="w-full h-56 object-cover">
+                            <img src="{{ $baiViet->hinh_anh_dai_dien ? Storage::url($baiViet->hinh_anh_dai_dien) : 'https://via.placeholder.com/400x250' }}"
+                                alt="{{ $baiViet->tieu_de }}" class="w-full h-56 object-cover">
                         </div>
                         <div class="p-6 flex flex-col flex-grow">
                             <h5 class="text-xl font-bold text-gray-900 mb-3">{{ $baiViet->tieu_de }}</h5>
                             <p class="text-gray-700 text-sm mb-4 flex-grow">{{ $baiViet->mo_ta_ngan }}</p>
-                            <a href="#" class="text-blue-600 hover:text-blue-800 font-semibold self-start">
+                            <a href="{{ route('news.show', $baiViet->slug) }}" class="text-blue-600 hover:text-blue-800 font-semibold self-start">
                                 Xem chi tiết &rarr;
                             </a>
                         </div>

@@ -4,9 +4,9 @@
             <div class="bg-white shadow-lg rounded-lg overflow-hidden">
 
                 @if ($baiViet->hinh_anh_dai_dien)
-                    <img src="{{ $baiViet->hinh_anh_dai_dien }}"
-                         alt="{{ $baiViet->tieu_de }}"
-                         class="w-full h-96 object-cover">
+                    <img src="{{ Storage::url($baiViet->hinh_anh_dai_dien) }}"
+                        alt="{{ $baiViet->tieu_de }}"
+                        class="w-full h-96 object-cover">
                 @endif
 
                 <div class="p-6 md:p-10">
