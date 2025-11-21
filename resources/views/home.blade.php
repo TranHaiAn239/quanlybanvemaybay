@@ -26,12 +26,13 @@
                 <div class="w-full md:w-[45%]">
 
                     {{-- Form tìm kiếm với nền tối --}}
-                    <div class="bg-gray-800 bg-opacity-80 rounded-lg shadow-2xl overflow-hidden">
+                    <div class="bg-gray-800 bg-opacity-80 rounded-lg shadow-2xl overflow-hidden"
+                         x-data="{ flightType: 'roundtrip' }"> {{-- 1. Khởi tạo Alpine --}}
 
                         {{-- Header của Form --}}
                         <div class="bg-gray-900 bg-opacity-70 text-white p-4">
                             <h4 class="text-lg font-bold uppercase flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path clip-rule="evenodd" fill-rule="evenodd" d="M19.122 4.06a.75.75 0 00-.773-.59H1.65a.75.75 0 00-.773.59c-.067.319-.028.647.11.932l2.67 5.51a.75.75 0 00.686.42h11.21l-3.235-2.07a.75.75 0 010-1.118l3.235-2.07zM1.08 10.998c.022.012.043.025.065.037l2.67 5.51c.138.285.421.455.736.455h11.21l-3.235-2.07a.75.75 0 010-1.118l3.235-2.07c.022.012.043.025.065.037a.75.75 0 01.35 1.018l-2.67 5.51a.75.75 0 01-1.372 0l-3.235-2.07a.75.75 0 00-1.022 1.118l3.235 2.07a.75.75 0 01-1.372 0l-3.235-2.07a.75.75 0 00-1.022 1.118l3.235 2.07a.75.75 0 01-1.372 0L2.11 12.016a.75.75 0 01.35-1.018z"></path></svg>
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" fill-rule="evenodd" d="M19.122 4.06a.75.75 0 00-.773-.59H1.65a.75.75 0 00-.773.59c-.067.319-.028.647.11.932l2.67 5.51a.75.75 0 00.686.42h11.21l-3.235-2.07a.75.75 0 010-1.118l3.235-2.07zM1.08 10.998c.022.012.043.025.065.037l2.67 5.51c.138.285.421.455.736.455h11.21l-3.235-2.07a.75.75 0 010-1.118l3.235-2.07c.022.012.043.025.065.037a.75.75 0 01.35 1.018l-2.67 5.51a.75.75 0 01-1.372 0l-3.235-2.07a.75.75 0 00-1.022 1.118l3.235 2.07a.75.75 0 01-1.372 0l-3.235-2.07a.75.75 0 00-1.022 1.118l3.235 2.07a.75.75 0 01-1.372 0L2.11 12.016a.75.75 0 01.35-1.018z"></path></svg>
                                 ĐẶT VÉ MÁY BAY ONLINE
                             </h4>
                         </div>
@@ -41,11 +42,15 @@
 
                             <div class="flex items-center space-x-6 mb-5">
                                 <label class="flex items-center text-white cursor-pointer">
-                                    <input type="radio" name="flight_type" value="roundtrip" class="form-radio text-blue-500 h-5 w-5" checked>
+                                    <input type="radio" name="flight_type" value="roundtrip"
+                                           class="form-radio text-blue-500 h-5 w-5"
+                                           x-model="flightType"> {{-- 2. Gắn model --}}
                                     <span class="ml-2 text-lg">Khứ hồi</span>
                                 </label>
                                 <label class="flex items-center text-white cursor-pointer">
-                                    <input type="radio" name="flight_type" value="oneway" class="form-radio text-blue-500 h-5 w-5">
+                                    <input type="radio" name="flight_type" value="oneway"
+                                           class="form-radio text-blue-500 h-5 w-5"
+                                           x-model="flightType"> {{-- 2. Gắn model --}}
                                     <span class="ml-2 text-lg">Một chiều</span>
                                 </label>
                             </div>
@@ -56,7 +61,7 @@
                                 <div class="mb-4">
                                     <select class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg p-3"
                                             id="san_bay_di" name="id_san_bay_di" required>
-                                        <option value="">Chọn điểm xuất phát</option>
+                                        <option value="">Hồ Chí Minh (SGN)</option>
                                         @foreach($sanBays as $sanBay)
                                             <option value="{{ $sanBay->id }}">{{ $sanBay->ten_san_bay }} ({{ $sanBay->ma_san_bay }})</option>
                                         @endforeach
@@ -67,7 +72,7 @@
                                 <div class="mb-4">
                                     <select class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg p-3"
                                             id="san_bay_den" name="id_san_bay_den" required>
-                                        <option value="">Chọn điểm đến</option>
+                                        <option value="">Hà Nội (HAN)</option>
                                         @foreach($sanBays as $sanBay)
                                             <option value="{{ $sanBay->id }}">{{ $sanBay->ten_san_bay }} ({{ $sanBay->ma_san_bay }})</option>
                                         @endforeach
@@ -75,11 +80,16 @@
                                 </div>
 
                                 <div class="flex flex-col sm:flex-row sm:space-x-4 mb-4">
-                                    <div class="w-full sm:w-1/2 mb-4 sm:mb-0">
+
+                                    <div class="mb-4 sm:mb-0"
+                                         :class="flightType === 'oneway' ? 'w-full' : 'w-full sm:w-1/2'">
                                         <label for="ngay_di" class="block font-medium text-sm text-gray-300 mb-1">Ngày đi:</label>
                                         <input type="date" class="block w-full rounded-md border-gray-300 shadow-sm p-3" id="ngay_di" name="ngay_di" required>
                                     </div>
-                                    <div class="w-full sm:w-1/2">
+
+                                    <div class="w-full sm:w-1/2"
+                                         x-show="flightType === 'roundtrip'"
+                                         x-transition.opacity> {{-- Hiệu ứng mờ dần --}}
                                         <label for="ngay_ve" class="block font-medium text-sm text-gray-300 mb-1">Ngày về:</label>
                                         <input type="date" class="block w-full rounded-md border-gray-300 shadow-sm p-3" id="ngay_ve" name="ngay_ve">
                                     </div>
@@ -108,7 +118,7 @@
 
                                 {{-- Nút Tìm Kiếm --}}
                                 <div class="mt-5">
-                                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg text-lg uppercase shadow-lg">
+                                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg text-lg uppercase shadow-lg transition-transform hover:scale-105">
                                         TÌM KIẾM VÉ
                                     </button>
                                 </div>
