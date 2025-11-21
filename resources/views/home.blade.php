@@ -61,7 +61,7 @@
                                 <div class="mb-4">
                                     <select class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg p-3"
                                             id="san_bay_di" name="id_san_bay_di" required>
-                                        <option value="">Hồ Chí Minh (SGN)</option>
+                                        <option value="">Chọn điểm xuất phát</option>
                                         @foreach($sanBays as $sanBay)
                                             <option value="{{ $sanBay->id }}">{{ $sanBay->ten_san_bay }} ({{ $sanBay->ma_san_bay }})</option>
                                         @endforeach
@@ -72,7 +72,7 @@
                                 <div class="mb-4">
                                     <select class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg p-3"
                                             id="san_bay_den" name="id_san_bay_den" required>
-                                        <option value="">Hà Nội (HAN)</option>
+                                        <option value="">Chọn điểm đến</option>
                                         @foreach($sanBays as $sanBay)
                                             <option value="{{ $sanBay->id }}">{{ $sanBay->ten_san_bay }} ({{ $sanBay->ma_san_bay }})</option>
                                         @endforeach
