@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use App\Filament\Resources\BookingResource\RelationManagers\VesRelationManager;
 use App\Filament\Resources\BookingResource\Pages;
 use App\Models\Booking;
 
@@ -122,6 +122,7 @@ class BookingResource extends Resource
     {
         return [
             //
+            VesRelationManager::class,
         ];
     }
 

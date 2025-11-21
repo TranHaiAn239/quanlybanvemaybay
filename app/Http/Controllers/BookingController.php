@@ -103,117 +103,139 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validate request cơ bản
+        // 1. Validate dữ liệu cơ bản
         $request->validate([
             'id_chuyen_bay_di' => 'required|exists:chuyen_bay,id',
             'id_chuyen_bay_ve' => 'nullable|exists:chuyen_bay,id',
-            'form_data' => 'required|json', // Chỉ nhận 1 input JSON
+            'form_data' => 'required|json',
         ]);
-
-        // 2. Giải mã JSON
-        $formData = json_decode($request->form_data, true);
-
-        // 3. (FIX) Validate dữ liệu BÊN TRONG JSON
-        $validator = Validator::make($formData, [
-            'passengers_data' => 'required|array|min:1',
-            'passengers_data.*.ho_ten' => 'required|string|max:100', // Đảm bảo họ tên không trống
-            'passengers_data.*.type' => 'required|in:nguoi_lon,tre_em,em_be',
-            // Bạn có thể thêm validate cho email, sdt nếu muốn
-        ], [
-            // Thông báo lỗi tiếng Việt
-            'passengers_data.*.ho_ten.required' => 'Vui lòng nhập họ tên cho tất cả hành khách.',
-        ]);
-
-        if ($validator->fails()) {
-            // Nếu validate fail, quay lại với lỗi
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        // 4. Lấy dữ liệu đã validate (an toàn)
-        $validatedData = $validator->validated();
-        $passengers_data = $validatedData['passengers_data'];
 
         $chuyenBayDi = ChuyenBay::findOrFail($request->id_chuyen_bay_di);
         $chuyenBayVe = $request->filled('id_chuyen_bay_ve') ? ChuyenBay::findOrFail($request->id_chuyen_bay_ve) : null;
         $isRoundTrip = (bool)$chuyenBayVe;
 
-        // 5. Định nghĩa giá (Copy y hệt từ hàm create)
-        $baggage_price_list = [ 0 => 0, 216000 => 216000, 324000 => 324000, 432000 => 432000, 594000 => 594000, 702000 => 702000, 810000 => 810000 ];
+        // Giải mã JSON từ Alpine.js
+        $formData = json_decode($request->form_data, true);
+        $passengers_data = $formData['passengers_data'];
 
-        // 6. Khởi tạo tổng tiền
+        // 2. Định nghĩa giá hành lý (Lookup Table)
+        $baggage_price_list = [
+            0 => 0,
+            216000 => 216000, 324000 => 324000, 432000 => 432000,
+            594000 => 594000, 702000 => 702000, 810000 => 810000
+        ];
+
+        // FIX: Định nghĩa Map loại ghế (Tiếng Việt có dấu -> Không dấu)
+        $seat_map = [
+            'phổ thông' => 'pho_thong',
+            'thương gia' => 'thuong_gia',
+            'hạng nhất' => 'hang_nhat',
+            // Dự phòng trường hợp gửi lên không dấu sẵn
+            'pho_thong' => 'pho_thong',
+            'thuong_gia' => 'thuong_gia',
+            'hang_nhat' => 'hang_nhat',
+        ];
+
+        // 3. Khởi tạo tổng tiền
         $tong_tien_ve_thuc_te = 0;
         $tong_tien_ghe_thuc_te = 0;
         $tong_tien_thue_thuc_te = 0;
         $tong_tien_hanh_ly_thuc_te = 0;
+
         $danh_sach_hanh_khach = [];
 
-        // 7. Lặp qua request ĐỂ TÍNH TỔNG TIỀN (Server-side)
+        // 4. Lặp qua dữ liệu để TÍNH TOÁN
         foreach ($passengers_data as $index => $passenger) {
-            $loai = $passenger['type'];
-            $loai_ghe = $passenger['seat_type'] ?? 'phổ thông';
 
-            // --- Giá vé (Server-side) ---
+            // FIX: Lấy loại hành khách từ JSON (nguoi_lon, tre_em, em_be)
+            $loai_khach = $passenger['type'];
+
+            // FIX: Lấy loại ghế và Chuyển sang không dấu
+            $raw_seat_type = $passenger['seat_type'] ?? 'phổ thông';
+            if ($loai_khach === 'em_be') {
+                $loai_ghe_db = 'pho_thong'; // Em bé luôn phổ thông
+            } else {
+                $loai_ghe_db = $seat_map[$raw_seat_type] ?? 'pho_thong';
+            }
+
+            // --- A. TÍNH GIÁ VÉ GỐC (Base Fare) ---
             $gia_goc_di = $chuyenBayDi->gia_ve;
-            if ($loai === 'tre_em') $gia_goc_di *= 0.75;
-            if ($loai === 'em_be') $gia_goc_di *= 0.10;
+            if ($loai_khach === 'tre_em') $gia_goc_di *= 0.75;
+            if ($loai_khach === 'em_be') $gia_goc_di *= 0.10;
 
             $gia_goc_ve = 0;
             if ($isRoundTrip) {
                 $gia_goc_ve = $chuyenBayVe->gia_ve;
-                if ($loai === 'tre_em') $gia_goc_ve *= 0.75;
-                if ($loai === 'em_be') $gia_goc_ve *= 0.10;
+                if ($loai_khach === 'tre_em') $gia_goc_ve *= 0.75;
+                if ($loai_khach === 'em_be') $gia_goc_ve *= 0.10;
             }
-            $tong_gia_goc_ve = $gia_goc_di + $gia_goc_ve;
-            $tong_tien_ve_thuc_te += $tong_gia_goc_ve;
 
-            // --- Giá ghế (Server-side) ---
-            $gia_ghe = 0;
-            if ($loai_ghe === 'thương gia') {
-                $gia_ghe = $tong_gia_goc_ve * 0.05;
-            } else if ($loai_ghe === 'hạng nhất') {
-                $gia_ghe = $tong_gia_goc_ve * 0.10;
+            // --- B. TÍNH GIÁ GHẾ (Seat Fee) - Lưu riêng ---
+            $gia_ghe_di = 0;
+            $gia_ghe_ve = 0;
+
+            // Tính % tăng thêm dựa trên giá gốc
+            if ($loai_ghe_db === 'thuong_gia') {
+                $gia_ghe_di = $gia_goc_di * 0.05; // 5%
+                if ($isRoundTrip) $gia_ghe_ve = $gia_goc_ve * 0.05;
+            } elseif ($loai_ghe_db === 'hang_nhat') {
+                $gia_ghe_di = $gia_goc_di * 0.10; // 10%
+                if ($isRoundTrip) $gia_ghe_ve = $gia_goc_ve * 0.10;
             }
-            $tong_tien_ghe_thuc_te += $gia_ghe;
 
-            // --- Giá hành lý (Server-side) ---
+            // --- C. TÍNH GIÁ HÀNH LÝ (Baggage Fee) - Lưu riêng ---
             $gia_hanh_ly_key = $passenger['baggage_fee'] ?? 0;
             $gia_hanh_ly = $baggage_price_list[$gia_hanh_ly_key] ?? 0;
+
+            // --- D. TÍNH THUẾ (Tax) ---
+            // Thuế = 8% của (Vé + Ghế)
+            $thue_di = ($gia_goc_di + $gia_ghe_di) * 0.08;
+            $thue_ve = ($isRoundTrip) ? ($gia_goc_ve + $gia_ghe_ve) * 0.08 : 0;
+
+            // Cộng dồn vào tổng Booking
+            $tong_tien_ve_thuc_te += ($gia_goc_di + $gia_goc_ve);
+            $tong_tien_ghe_thuc_te += ($gia_ghe_di + $gia_ghe_ve);
+            $tong_tien_thue_thuc_te += ($thue_di + $thue_ve);
             $tong_tien_hanh_ly_thuc_te += $gia_hanh_ly;
 
-            // Lưu thông tin (Lấy từ JSON)
+            // Lưu dữ liệu đã tính toán vào mảng tạm để dùng ở bước Tạo Vé
             $danh_sach_hanh_khach[$index] = [
-                'ho_ten' => $passenger['ho_ten'],
-                'so_dien_thoai' => $passenger['so_dien_thoai'] ?? null,
-                'email' => $passenger['email'] ?? null,
-                'dia_chi' => $passenger['dia_chi'] ?? null,
-                'ghi_chu' => $passenger['ghi_chu'] ?? null,
-                'loai' => $loai,
-                'loai_ghe' => $loai_ghe,
-                'gia_ve_di' => $gia_goc_di,
-                'gia_ve_ve' => $gia_goc_ve,
-                'gia_ghe' => $gia_ghe,
-                'gia_hanh_ly_di' => $gia_hanh_ly,
+                'info' => [ // Thông tin cá nhân
+                    'ho_ten' => $passenger['ho_ten'],
+                    'so_dien_thoai' => $passenger['so_dien_thoai'] ?? null,
+                    'email' => $passenger['email'] ?? null,
+                    'dia_chi' => $passenger['dia_chi'] ?? null,
+                    'ghi_chu' => $passenger['ghi_chu'] ?? null,
+                ],
+                'data' => [ // Thông tin vé
+                    'loai_hanh_khach' => $loai_khach, // FIX: Lưu đúng loại (nguoi_lon/tre_em...)
+                    'loai_ghe' => $loai_ghe_db,       // FIX: Lưu không dấu (pho_thong...)
+
+                    // Chuyến đi
+                    'gia_ve_di' => $gia_goc_di + $thue_di, // Lưu (Giá gốc + Thuế) vào cột gia_ve
+                    'gia_ghe_di' => $gia_ghe_di,           // FIX: Lưu riêng tiền ghế
+                    'gia_hanh_ly_di' => $gia_hanh_ly,      // FIX: Lưu riêng tiền hành lý
+
+                    // Chuyến về
+                    'gia_ve_ve' => $gia_goc_ve + $thue_ve,
+                    'gia_ghe_ve' => $gia_ghe_ve,
+                    'gia_hanh_ly_ve' => 0, // Hành lý chỉ tính 1 lần ở vé đi (hoặc chia đôi tùy bạn)
+                ]
             ];
         }
 
-        // 8. TÍNH TỔNG CỘNG, THUẾ, GIẢM GIÁ (Server-side)
-        $tong_ve_va_ghe = $tong_tien_ve_thuc_te + $tong_tien_ghe_thuc_te;
-        $tong_thue = $tong_ve_va_ghe * 0.08;
-        $tong_cong_truoc_giam = $tong_ve_va_ghe + $tong_thue + $tong_tien_hanh_ly_thuc_te;
+        // 5. TÍNH TỔNG CỘNG VÀ GIẢM GIÁ
+        $tong_cong_truoc_giam = $tong_tien_ve_thuc_te + $tong_tien_ghe_thuc_te + $tong_tien_thue_thuc_te + $tong_tien_hanh_ly_thuc_te;
 
+        // Xử lý giảm giá
         $giam_gia_khu_hoi = $formData['roundtrip_discount'] ?? 0;
-
         $giam_gia_km = 0;
         $id_khuyen_mai = null;
         if (!empty($formData['promo_code'])) {
-            $khuyenMai = \App\Models\KhuyenMai::where('ma_khuyen_mai', $formData['promo_code'])
-                                    ->where('trang_thai', 'hieu_luc')
-                                    ->first();
-
+            $khuyenMai = \App\Models\KhuyenMai::where('ma_khuyen_mai', $formData['promo_code'])->first();
             if ($khuyenMai) {
                 $id_khuyen_mai = $khuyenMai->id;
                 $baseForPromo = $tong_cong_truoc_giam - $giam_gia_khu_hoi;
-
                 if ($khuyenMai->loai_gia_tri === 'phan_tram') {
                     $giam_gia_km = $baseForPromo * ($khuyenMai->gia_tri / 100);
                 } else {
@@ -221,17 +243,14 @@ class BookingController extends Controller
                 }
             }
         }
-
         $tong_giam_gia = $giam_gia_khu_hoi + $giam_gia_km;
-        $tong_tien_cuoi_cung = $tong_cong_truoc_giam - $tong_giam_gia;
+        $tong_tien_cuoi_cung = max(0, $tong_cong_truoc_giam - $tong_giam_gia);
 
-        $booking = null;
-
-        // 9. Bắt đầu Transaction
+        // 6. LƯU VÀO CSDL (DB Transaction)
         try {
             DB::beginTransaction();
 
-            // 10. Tạo Booking
+            // Tạo Booking
             $booking = Booking::create([
                 'id_nguoi_dung' => Auth::id(),
                 'ma_booking' => 'VMB' . strtoupper(Str::random(8)),
@@ -239,43 +258,42 @@ class BookingController extends Controller
                 'id_khuyen_mai' => $id_khuyen_mai,
                 'giam_gia' => $tong_giam_gia,
                 'trang_thai' => 'cho_thanh_toan',
+                'phuong_thuc_tt' => 'khong',
             ]);
 
-            // 11. Lặp lại danh sách hành khách ĐỂ LƯU VÉ
-            foreach ($danh_sach_hanh_khach as $passenger) {
+            // Tạo Vé và Thông tin người đi
+            foreach ($danh_sach_hanh_khach as $item) {
+                $info = $item['info'];
+                $data = $item['data'];
 
-                $thue_ve_di = $passenger['gia_ve_di'] * 0.08;
-                $thue_ve_ve = $passenger['gia_ve_ve'] * 0.08;
-                $gia_ghe_ve = $passenger['gia_ghe'];
-
-                // --- TẠO VÉ LƯỢT ĐI ---
+                // --- VÉ LƯỢT ĐI ---
                 $ve_di = Ve::create([
                     'id_booking' => $booking->id,
                     'id_chuyen_bay' => $chuyenBayDi->id,
-                    'loai_hanh_khach' => $passenger['loai'],
-                    'loai_ghe' => $passenger['loai_ghe'],
+                    'loai_hanh_khach' => $data['loai_hanh_khach'], // FIX: Lưu đúng loại
+                    'loai_ghe' => $data['loai_ghe'],               // FIX: Lưu không dấu
                     'so_ghe' => null,
-                    'gia_ve' => $passenger['gia_ve_di'] + $thue_ve_di,
-                    'gia_ghe' => $gia_ghe_ve,
-                    'gia_hanh_ly' => $passenger['gia_hanh_ly_di'],
+                    'gia_ve' => $data['gia_ve_di'],                // Giá vé + thuế
+                    'gia_ghe' => $data['gia_ghe_di'],              // FIX: Lưu giá ghế riêng
+                    'gia_hanh_ly' => $data['gia_hanh_ly_di'],      // FIX: Lưu giá hành lý riêng
                     'trang_thai' => 'cho_xac_nhan',
                 ]);
-                ThongTinNguoiDi::create(['id_ve' => $ve_di->id] + $passenger);
+                ThongTinNguoiDi::create(['id_ve' => $ve_di->id] + $info);
 
-                // --- TẠO VÉ LƯỢT VỀ (nếu có) ---
+                // --- VÉ LƯỢT VỀ (Nếu có) ---
                 if ($isRoundTrip && $chuyenBayVe) {
                     $ve_ve = Ve::create([
                         'id_booking' => $booking->id,
                         'id_chuyen_bay' => $chuyenBayVe->id,
-                        'loai_hanh_khach' => $passenger['loai'],
-                        'loai_ghe' => $passenger['loai_ghe'],
+                        'loai_hanh_khach' => $data['loai_hanh_khach'],
+                        'loai_ghe' => $data['loai_ghe'],
                         'so_ghe' => null,
-                        'gia_ve' => $passenger['gia_ve_ve'] + $thue_ve_ve,
-                        'gia_ghe' => 0,
-                        'gia_hanh_ly' => 0,
+                        'gia_ve' => $data['gia_ve_ve'],
+                        'gia_ghe' => $data['gia_ghe_ve'],          // FIX: Lưu giá ghế riêng
+                        'gia_hanh_ly' => 0,                        // Hành lý đã tính ở lượt đi
                         'trang_thai' => 'cho_xac_nhan',
                     ]);
-                    ThongTinNguoiDi::create(['id_ve' => $ve_ve->id] + $passenger);
+                    ThongTinNguoiDi::create(['id_ve' => $ve_ve->id] + $info);
                 }
             }
 
@@ -283,12 +301,9 @@ class BookingController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Lỗi tạo booking (JSON): ' . $e->getMessage());
-            // (FIX) Trả về lỗi chi tiết cho session 'error'
             return redirect()->back()->with('error', 'Lỗi CSDL: ' . $e->getMessage());
         }
 
-        // 12. Chuyển hướng đến trang thanh toán
         return redirect()->route('payment.show', ['maBooking' => $booking->ma_booking]);
     }
 }

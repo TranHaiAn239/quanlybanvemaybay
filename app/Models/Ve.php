@@ -15,8 +15,13 @@ class Ve extends Model
     protected $fillable = [
         'id_booking',
         'id_chuyen_bay',
+        // Thêm các cột này vào:
+        'loai_hanh_khach',
+        'loai_ghe',        // <--- QUAN TRỌNG
         'so_ghe',
         'gia_ve',
+        'gia_hanh_ly',     // <--- QUAN TRỌNG
+        'gia_ghe',         // <--- QUAN TRỌNG
         'trang_thai',
     ];
 
