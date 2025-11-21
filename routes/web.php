@@ -10,6 +10,7 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\OrderHistoryController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\DealHunterController;
+use App\Http\Controllers\ChatbotController;
 
 /*
 |--------------------------------------------------------------------------
@@ -87,3 +88,5 @@ Route::get('/in-hoa-don/{booking}', [OrderHistoryController::class, 'printInvoic
 require __DIR__.'/auth.php';
 
 Route::get('/vnpay-done', [PaymentController::class, 'vnpayReturn']);
+
+Route::post('/api/chatbot', [ChatbotController::class, 'handle'])->name('chatbot.handle');
