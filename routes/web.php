@@ -85,3 +85,5 @@ Route::get('/in-hoa-don/{booking}', [OrderHistoryController::class, 'printInvoic
      ->name('invoice.print');
 // Route cho file auth.php (Của Breeze)
 require __DIR__.'/auth.php';
+
+Route::get('/vnpay-done', [PaymentController::class, 'vnpayReturn']);

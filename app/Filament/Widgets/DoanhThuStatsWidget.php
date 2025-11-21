@@ -9,6 +9,7 @@ use App\Models\Booking;
 
 class DoanhThuStatsWidget extends BaseWidget
 {
+    protected int | string | array $columnSpan = 'full';
     protected function getCards(): array
     {
         $totalRevenue = HoaDon::where('trang_thai', 'da_thanh_toan')->sum('tong_tien');

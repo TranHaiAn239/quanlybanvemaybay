@@ -13,6 +13,7 @@ class RevenueChartWidget extends LineChartWidget
     protected static ?string $heading = 'Doanh thu 12 tháng qua';
     protected static ?string $maxHeight = '300px';
 
+    protected int | string | array $columnSpan = 1;
     protected function getData(): array
     {
         // 1. Lấy dữ liệu doanh thu từ CSDL

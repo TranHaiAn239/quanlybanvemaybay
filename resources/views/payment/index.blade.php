@@ -54,10 +54,21 @@
                                 <h3 class="text-xl font-semibold text-gray-800 mb-4">Chọn phương thức thanh toán</h3>
                                 <div class="space-y-4">
 
+                                    <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+                                        <input type="radio" name="phuong_thuc_tt" value="vnpay" class="h-5 w-5 text-blue-600" x-model="paymentMethod">
+                                        <span class="ml-4 flex items-center">
+                                            {{-- Bạn có thể tìm logo VNPay trên mạng --}}
+                                            <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Icon-VNPAY-QR.png" alt="VNPay" class="h-8 w-auto">
+                                            <span class="text-lg font-medium text-gray-700 ml-2">Thanh toán qua VNPay (ATM/QR)</span>
+                                        </span>
+                                    </label>
+
+
                                     {{-- 1. MOMO --}}
                                     <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
                                         <input type="radio" name="phuong_thuc_tt" value="momo" class="h-5 w-5 text-blue-600" x-model="paymentMethod" checked>
                                         <span class="ml-4 flex items-center">
+                                            <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-MoMo-Square.png" alt="MOMO" class="h-8 w-auto">
                                                                                         <span class="text-lg font-medium text-gray-700 ml-2">Thanh toán qua Ví Momo</span>
                                         </span>
                                     </label>
@@ -66,6 +77,7 @@
                                     <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
                                         <input type="radio" name="phuong_thuc_tt" value="zalopay" class="h-5 w-5 text-blue-600" x-model="paymentMethod">
                                         <span class="ml-4 flex items-center">
+                                            <img src="https://cdn.brandfetch.io/id_T-oXJkN/w/1624/h/1624/theme/dark/icon.jpeg?c=1dxbfHSJFAPEGdCLU4o5B" alt="ZaloPay" class="h-8 w-auto">
                                                                                         <span class="text-lg font-medium text-gray-700 ml-2">Thanh toán qua Ví ZaloPay</span>
                                         </span>
                                     </label>
@@ -74,6 +86,7 @@
                                     <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
                                         <input type="radio" name="phuong_thuc_tt" value="the_tin_dung" class="h-5 w-5 text-blue-600" x-model="paymentMethod">
                                         <span class="ml-4 flex items-center">
+                                            <img src="https://as2.ftcdn.net/v2/jpg/16/09/83/77/1000_F_1609837704_7ZqSU0ZnY9FQYWbvoT8aXWe6yxSt8vao.jpg" alt="ttd" class="h-8 w-auto">
                                                                                         <span class="text-lg font-medium text-gray-700 ml-2">Thẻ tín dụng/ghi nợ (Visa, Master)</span>
                                         </span>
                                     </label>
@@ -82,6 +95,7 @@
                                     <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
                                         <input type="radio" name="phuong_thuc_tt" value="tien_mat" class="h-5 w-5 text-blue-600" x-model="paymentMethod">
                                         <span class="ml-4 flex items-center">
+                                            <img src="https://img.pikbest.com/element_our/20230221/bg/ebab41b9c1ab9.png!w700wp" alt="tm" class="h-8 w-auto">
                                                                                         <span class="text-lg font-medium text-gray-700 ml-2">Thanh toán tiền mặt tại văn phòng</span>
                                         </span>
                                     </label>

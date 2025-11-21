@@ -32,12 +32,18 @@ class ReportDoanhThu extends Page implements HasTable
     protected static ?int $navigationSort = 1;
     // ============================================
 
+    protected function getHeaderWidgetsColumns(): int | array
+    {
+        return 2;
+    }
+
     // Hiển thị Widget
     protected function getHeaderWidgets(): array
     {
         return [
-            \App\Filament\Widgets\DoanhThuStatsWidget::class,
-            \App\Filament\Widgets\RevenueChartWidget::class,
+            \App\Filament\Widgets\DoanhThuStatsWidget::class, // Sẽ tự động full width
+            \App\Filament\Widgets\RevenueChartWidget::class,       // Cột trái
+            \App\Filament\Widgets\DetailedRevenueStatsWidget::class, // Cột phải (MỚI)
         ];
     }
 

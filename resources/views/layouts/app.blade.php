@@ -32,6 +32,7 @@
                 {{ $slot }}
             </main>
         </div>
+    @include('partials.chatbox')
     </body>
 
     <footer class="bg-gray-900 text-gray-400 pt-16 pb-8">
