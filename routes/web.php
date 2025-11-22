@@ -92,3 +92,5 @@ require __DIR__.'/auth.php';
 Route::get('/vnpay-done', [PaymentController::class, 'vnpayReturn']);
 
 Route::post('/api/chatbot', [ChatbotController::class, 'handle'])->name('chatbot.handle');
+
+Route::post('/ho-tro/store', [SupportController::class, 'storeSupportRequest'])->name('support.store');

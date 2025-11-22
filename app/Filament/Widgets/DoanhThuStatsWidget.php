@@ -6,20 +6,33 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Card;
 use App\Models\HoaDon;
 use App\Models\Booking;
+use App\Models\YeuCauHoTro; // <-- Thêm Model này
 
 class DoanhThuStatsWidget extends BaseWidget
 {
     protected int | string | array $columnSpan = 'full';
+
     protected function getCards(): array
     {
-        $totalRevenue = HoaDon::where('trang_thai', 'da_thanh_toan')->sum('tong_tien');
+        // 1. Doanh thu từ Hóa đơn bán hàng
+        $invoiceRevenue = HoaDon::where('trang_thai', 'da_thanh_toan')->sum('tong_tien');
+
+        // 2. Doanh thu từ Phí hủy vé (Yêu cầu hỗ trợ đã hoàn tất)
+        $cancellationRevenue = YeuCauHoTro::where('trang_thai', 'hoan_tat')
+            ->where('loai_yeu_cau', 'huy_ve')
+            ->sum('phu_phi_huy');
+
+        // 3. TỔNG DOANH THU THỰC TẾ
+        $totalRevenue = $invoiceRevenue + $cancellationRevenue;
+
+        // Các thống kê khác
         $totalOrders = HoaDon::where('trang_thai', 'da_thanh_toan')->count();
         $pendingOrders = Booking::where('trang_thai', 'cho_thanh_toan')->count();
         $cancelledOrders = Booking::where('trang_thai', 'huy')->count();
 
         return [
             Card::make('Tổng Doanh Thu', number_format($totalRevenue, 0, ',', '.') . ' VND')
-                ->description('Đã thanh toán')
+                ->description('Vé bán ra + Phí hủy vé') // Cập nhật mô tả
                 ->descriptionIcon('heroicon-s-cash')
                 ->color('success'),
 

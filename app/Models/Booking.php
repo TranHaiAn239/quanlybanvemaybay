@@ -22,11 +22,13 @@ class Booking extends Model
         'trang_thai',
         'phuong_thuc_tt',
         'id_khuyen_mai',
+        'giam_gia',
     ];
 
     protected $casts = [
         'tong_tien' => 'decimal:2',
         'ngay_dat' => 'datetime',
+        'giam_gia' => 'decimal:2',
     ];
 
     // ========== QUAN HỆ ==========

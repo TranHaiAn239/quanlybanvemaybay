@@ -66,9 +66,84 @@
                             LIÊN HỆ VỚI <span class="text-red-500">SANVEMAYBAY.VN</span>
                         </h2>
 
-                        <p class="text-lg text-gray-700 mb-8 leading-relaxed">
-                            Thắc mắc về phương thức thanh toán, đặt vé online hoặc khiếu nại về dịch vụ. Vui lòng điền đầy đủ thông tin và gửi về cho chúng tôi. Sanvemaybay.vn xem ý kiến của khách hàng là chìa khóa giúp chúng tôi sửa đổi và nâng cấp dịch vụ đồng thời là thước đo thành công của chúng tôi.
-                        </p>
+                        <div class="prose prose-lg max-w-none text-gray-700 mb-8">
+                            <p>
+                                Thắc mắc về phương thức thanh toán, đặt vé online hoặc khiếu nại. Vui lòng điền đầy đủ thông tin vào form dưới đây.
+                            </p>
+                        </div>
+
+                        <form action="{{ route('support.store') }}" method="POST" class="space-y-6">
+                            @csrf
+                            {{-- Lấy ID người dùng nếu đã đăng nhập --}}
+                            @auth
+                            <input type="hidden" name="id_nguoi_dung" value="{{ Auth::id() }}">
+                            @endauth
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {{-- Mã Booking --}}
+                                <div>
+                                    <label for="ma_booking" class="block text-sm font-medium text-gray-700">Mã Booking (Nếu có)</label>
+                                    <input type="text" id="ma_booking" name="ma_booking"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="VD: VMBXYZ123">
+                                </div>
+
+                                {{-- Loại Yêu Cầu --}}
+                                <div>
+                                    <label for="loai_yeu_cau" class="block text-sm font-medium text-gray-700">Loại Yêu Cầu</label>
+                                    <select id="loai_yeu_cau" name="loai_yeu_cau" required
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                                        <option value="huy_ve">Yêu cầu Hủy vé</option>
+                                        <option value="hoan_tien">Yêu cầu Hoàn tiền</option>
+                                        <option value="thong_tin">Yêu cầu Thông tin</option>
+                                        <option value="khac">Khác</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {{-- Họ tên --}}
+                                <div>
+                                    <label for="ho_ten" class="block text-sm font-medium text-gray-700">Họ Tên <span class="text-red-500">*</span></label>
+                                    <input type="text" id="ho_ten" name="ho_ten" required
+                                        value="{{ Auth::user()->ho_ten ?? '' }}"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                                </div>
+                                {{-- Email --}}
+                                <div>
+                                    <label for="email" class="block text-sm font-medium text-gray-700">Email <span class="text-red-500">*</span></label>
+                                    <input type="email" id="email" name="email" required
+                                        value="{{ Auth::user()->email ?? '' }}"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                                </div>
+                                {{-- Số điện thoại --}}
+                                <div>
+                                    <label for="so_dien_thoai" class="block text-sm font-medium text-gray-700">SĐT</label>
+                                    <input type="tel" id="so_dien_thoai" name="so_dien_thoai"
+                                        value="{{ Auth::user()->so_dien_thoai ?? '' }}"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                                </div>
+                            </div>
+
+                            {{-- Nội dung chi tiết --}}
+                            <div>
+                                <label for="noi_dung_yeu_cau" class="block text-sm font-medium text-gray-700">Nội dung chi tiết <span class="text-red-500">*</span></label>
+                                <textarea id="noi_dung_yeu_cau" name="noi_dung_yeu_cau" rows="4" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"></textarea>
+                            </div>
+
+                            <div class="flex justify-end">
+                                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg shadow-md">
+                                    Gửi Yêu Cầu Hỗ Trợ
+                                </button>
+                            </div>
+
+                            {{-- Hiển thị thông báo sau khi gửi --}}
+                            @if (session('support_success'))
+                            <div class="mt-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+                                {{ session('support_success') }}
+                            </div>
+                            @endif
+                        </form>
 
                         <div class="border-t border-gray-200 pt-8">
                             <h3 class="text-2xl font-semibold text-gray-800 mb-6">Liên Hệ Sanvemaybay.vn</h3>
