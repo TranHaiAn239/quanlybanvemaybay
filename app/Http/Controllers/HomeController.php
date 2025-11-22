@@ -13,8 +13,21 @@ class HomeController extends Controller
      */
     public function index()
     {
-        // Lấy toàn bộ sân bay cho form tìm kiếm
-        $sanBays = SanBay::orderBy('ten_san_bay', 'asc')->get();
+        // Lấy tất cả sân bay, sắp xếp theo Tên
+        $allAirports = SanBay::orderBy('ten_san_bay', 'asc')->get();
+
+        // Nhóm sân bay theo Quốc gia
+        // Kết quả sẽ là một Collection dạng:
+        // [
+        //    'Việt Nam' => [SanBay1, SanBay2...],
+        //    'Thái Lan' => [SanBay3...],
+        // ]
+        $groupedSanBays = $allAirports->groupBy('quoc_gia');
+
+        // Sắp xếp để 'Việt Nam' lên đầu tiên
+        $groupedSanBays = $groupedSanBays->sortBy(function ($list, $key) {
+            return $key === 'Việt Nam' ? 0 : 1;
+        });
 
         // Lấy 5 bài viết mới nhất đã xuất bản
         $tinTuc = BaiViet::where('trang_thai', 'xuat_ban')
@@ -30,7 +43,26 @@ class HomeController extends Controller
                        ->take(7) // Lấy 7 câu hỏi như ảnh
                        ->get();
         // ==== KẾT THÚC CODE MỚI ====
-        // Trả về view 'home' (home.blade.php) cùng với 2 biến
-        return view('home', compact('sanBays', 'tinTuc', 'faqs'));
+        // Lấy thời tiết 3 thành phố
+        $weatherData = [];
+        $cities = SanBay::select('tinh_thanh')->distinct()->pluck('tinh_thanh');
+
+        foreach ($cities as $city) {
+            $data = WeatherController::getWeather($city);
+            if (isset($data['cod']) && $data['cod'] == 200) {
+                 $weatherData[$city] = $data;
+            }
+        }
+        // Nếu API lỗi hoặc không có key, tạo dữ liệu giả để không vỡ giao diện
+        if (empty($weatherData)) {
+            $weatherData = [
+                'Hà Nội' => ['main' => ['temp' => 25, 'humidity' => 80], 'weather' => [['description' => 'Nắng đẹp', 'icon' => '01d']]],
+                'TP.HCM' => ['main' => ['temp' => 30, 'humidity' => 70], 'weather' => [['description' => 'Mây rải rác', 'icon' => '02d']]],
+            ];
+        }
+
+
+
+        return view('home', compact('groupedSanBays', 'tinTuc', 'faqs', 'weatherData'));
     }
 }

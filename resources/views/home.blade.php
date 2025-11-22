@@ -17,149 +17,186 @@
         </script> --}}
     @endif
 
-    <div class="w-full bg-cover bg-center py-16"
-         style="background-image: url('/images/background-san-ve-may-bay.jpg');">
+    <div class="w-full bg-cover bg-center relative py-16" style="background-image: url('/images/background-san-ve-may-bay.jpg');">
 
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row md:space-x-8">
+        <div class="absolute inset-0 bg-black/20"></div>
 
-                <div class="w-full md:w-[45%]">
+        <div class="relative max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-                    {{-- Form tìm kiếm với nền tối --}}
-                    <div class="bg-gray-800 bg-opacity-80 rounded-lg shadow-2xl overflow-hidden"
-                         x-data="{ flightType: 'roundtrip' }"> {{-- 1. Khởi tạo Alpine --}}
+            {{-- Grid 2 cột --}}
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
 
-                        {{-- Header của Form --}}
-                        <div class="bg-gray-900 bg-opacity-70 text-white p-4">
-                            <h4 class="text-lg font-bold uppercase flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" fill-rule="evenodd" d="M19.122 4.06a.75.75 0 00-.773-.59H1.65a.75.75 0 00-.773.59c-.067.319-.028.647.11.932l2.67 5.51a.75.75 0 00.686.42h11.21l-3.235-2.07a.75.75 0 010-1.118l3.235-2.07zM1.08 10.998c.022.012.043.025.065.037l2.67 5.51c.138.285.421.455.736.455h11.21l-3.235-2.07a.75.75 0 010-1.118l3.235-2.07c.022.012.043.025.065.037a.75.75 0 01.35 1.018l-2.67 5.51a.75.75 0 01-1.372 0l-3.235-2.07a.75.75 0 00-1.022 1.118l3.235 2.07a.75.75 0 01-1.372 0l-3.235-2.07a.75.75 0 00-1.022 1.118l3.235 2.07a.75.75 0 01-1.372 0L2.11 12.016a.75.75 0 01.35-1.018z"></path></svg>
-                                ĐẶT VÉ MÁY BAY ONLINE
-                            </h4>
+                <div class="bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-2xl overflow-hidden flex flex-col"
+                     x-data="{ flightType: 'roundtrip' }">
+
+                    {{-- Header Form --}}
+                    <div class="p-4 bg-blue-600 text-white font-bold uppercase flex items-center shadow-md flex-shrink-0">
+                        <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
+                        Đặt vé máy bay online
+                    </div>
+
+                    {{-- Body Form --}}
+                    <div class="p-6 flex-grow flex flex-col justify-center">
+                        <div class="flex items-center space-x-6 mb-6">
+                            <label class="flex items-center text-white cursor-pointer hover:text-blue-200 transition">
+                                <input type="radio" name="flight_type" value="roundtrip" class="form-radio text-blue-500 h-5 w-5 focus:ring-blue-500" x-model="flightType">
+                                <span class="ml-2 font-medium">Khứ hồi</span>
+                            </label>
+                            <label class="flex items-center text-white cursor-pointer hover:text-blue-200 transition">
+                                <input type="radio" name="flight_type" value="oneway" class="form-radio text-blue-500 h-5 w-5 focus:ring-blue-500" x-model="flightType">
+                                <span class="ml-2 font-medium">Một chiều</span>
+                            </label>
                         </div>
 
-                        {{-- Nội dung Form --}}
-                        <div class="p-6">
-
-                            <div class="flex items-center space-x-6 mb-5">
-                                <label class="flex items-center text-white cursor-pointer">
-                                    <input type="radio" name="flight_type" value="roundtrip"
-                                           class="form-radio text-blue-500 h-5 w-5"
-                                           x-model="flightType"> {{-- 2. Gắn model --}}
-                                    <span class="ml-2 text-lg">Khứ hồi</span>
-                                </label>
-                                <label class="flex items-center text-white cursor-pointer">
-                                    <input type="radio" name="flight_type" value="oneway"
-                                           class="form-radio text-blue-500 h-5 w-5"
-                                           x-model="flightType"> {{-- 2. Gắn model --}}
-                                    <span class="ml-2 text-lg">Một chiều</span>
-                                </label>
+                        <form action="{{ route('flight.search') }}" method="GET" class="space-y-4">
+                            <div class="space-y-4">
+                                <select class="block w-full rounded-lg border-gray-400 bg-white/90 text-gray-800 shadow-sm focus:ring-blue-500 focus:border-blue-500 py-3" name="id_san_bay_di" required>
+                                    <option value="">Chọn điểm xuất phát</option>
+                                    @foreach($groupedSanBays as $quocGia => $sanBays)
+                                        <optgroup label="{{ $quocGia }}">
+                                            @foreach($sanBays as $sanBay)
+                                                <option value="{{ $sanBay->id }}">{{ $sanBay->ten_san_bay }} ({{ $sanBay->ma_san_bay }})</option>
+                                            @endforeach
+                                        </optgroup>
+                                    @endforeach
+                                </select>
+                                <select class="block w-full rounded-lg border-gray-400 bg-white/90 text-gray-800 shadow-sm focus:ring-blue-500 focus:border-blue-500 py-3" name="id_san_bay_den" required>
+                                    <option value="">Chọn điểm đến</option>
+                                    @foreach($groupedSanBays as $quocGia => $sanBays)
+                                        <optgroup label="{{ $quocGia }}">
+                                            @foreach($sanBays as $sanBay)
+                                                <option value="{{ $sanBay->id }}">{{ $sanBay->ten_san_bay }} ({{ $sanBay->ma_san_bay }})</option>
+                                            @endforeach
+                                        </optgroup>
+                                    @endforeach
+                                </select>
                             </div>
-
-                            <form action="{{ route('flight.search') }}" method="GET">
-
-                                {{-- Điểm đi --}}
-                                <div class="mb-4">
-                                    <select class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg p-3"
-                                            id="san_bay_di" name="id_san_bay_di" required>
-                                        <option value="">Chọn điểm xuất phát</option>
-                                        @foreach($sanBays as $sanBay)
-                                            <option value="{{ $sanBay->id }}">{{ $sanBay->ten_san_bay }} ({{ $sanBay->ma_san_bay }})</option>
-                                        @endforeach
-                                    </select>
+                            <div class="flex flex-col sm:flex-row gap-4">
+                                <div class="flex-1">
+                                    <label class="block text-white text-sm mb-1">Ngày đi</label>
+                                    <input type="date" class="block w-full rounded-lg border-gray-400 bg-white/90 py-2.5" name="ngay_di" required>
                                 </div>
-
-                                {{-- Điểm đến --}}
-                                <div class="mb-4">
-                                    <select class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-lg p-3"
-                                            id="san_bay_den" name="id_san_bay_den" required>
-                                        <option value="">Chọn điểm đến</option>
-                                        @foreach($sanBays as $sanBay)
-                                            <option value="{{ $sanBay->id }}">{{ $sanBay->ten_san_bay }} ({{ $sanBay->ma_san_bay }})</option>
-                                        @endforeach
-                                    </select>
+                                <div class="flex-1" x-show="flightType === 'roundtrip'" x-transition>
+                                    <label class="block text-white text-sm mb-1">Ngày về</label>
+                                    <input type="date" class="block w-full rounded-lg border-gray-400 bg-white/90 py-2.5" name="ngay_ve">
                                 </div>
-
-                                <div class="flex flex-col sm:flex-row sm:space-x-4 mb-4">
-
-                                    <div class="mb-4 sm:mb-0"
-                                         :class="flightType === 'oneway' ? 'w-full' : 'w-full sm:w-1/2'">
-                                        <label for="ngay_di" class="block font-medium text-sm text-gray-300 mb-1">Ngày đi:</label>
-                                        <input type="date" class="block w-full rounded-md border-gray-300 shadow-sm p-3" id="ngay_di" name="ngay_di" required>
-                                    </div>
-
-                                    <div class="w-full sm:w-1/2"
-                                         x-show="flightType === 'roundtrip'"
-                                         x-transition.opacity> {{-- Hiệu ứng mờ dần --}}
-                                        <label for="ngay_ve" class="block font-medium text-sm text-gray-300 mb-1">Ngày về:</label>
-                                        <input type="date" class="block w-full rounded-md border-gray-300 shadow-sm p-3" id="ngay_ve" name="ngay_ve">
-                                    </div>
+                            </div>
+                            <div class="grid grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block text-white text-xs mb-1">Người lớn</label>
+                                    <select name="nguoi_lon" class="block w-full rounded-lg bg-white/90 py-2 text-sm"><option>1</option><option>2</option><option>3</option><option>4</option></select>
                                 </div>
-
-                                <div class="flex space-x-4 mb-6">
-                                    <div class="w-1/3">
-                                        <label for="nguoi_lon" class="block font-medium text-sm text-gray-300 mb-1">Người lớn</label>
-                                        <select class="block w-full rounded-md border-gray-300 shadow-sm p-3" id="nguoi_lon" name="nguoi_lon">
-                                            <option>1</option><option>2</option><option>3</option><option>4</option>
-                                        </select>
-                                    </div>
-                                    <div class="w-1/3">
-                                        <label for="tre_em" class="block font-medium text-sm text-gray-300 mb-1">Trẻ em</label>
-                                        <select class="block w-full rounded-md border-gray-300 shadow-sm p-3" id="tre_em" name="tre_em">
-                                            <option>0</option><option>1</option><option>2</option>
-                                        </select>
-                                    </div>
-                                    <div class="w-1/3">
-                                        <label for="em_be" class="block font-medium text-sm text-gray-300 mb-1">Em bé</label>
-                                        <select class="block w-full rounded-md border-gray-300 shadow-sm p-3" id="em_be" name="em_be">
-                                            <option>0</option><option>1</option><option>2</option>
-                                        </select>
-                                    </div>
+                                <div>
+                                    <label class="block text-white text-xs mb-1">Trẻ em</label>
+                                    <select name="tre_em" class="block w-full rounded-lg bg-white/90 py-2 text-sm"><option>0</option><option>1</option><option>2</option></select>
                                 </div>
-
-                                {{-- Nút Tìm Kiếm --}}
-                                <div class="mt-5">
-                                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg text-lg uppercase shadow-lg transition-transform hover:scale-105">
-                                        TÌM KIẾM VÉ
-                                    </button>
+                                <div>
+                                    <label class="block text-white text-xs mb-1">Em bé</label>
+                                    <select name="em_be" class="block w-full rounded-lg bg-white/90 py-2 text-sm"><option>0</option><option>1</option></select>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                            <button class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 rounded-lg shadow-lg transition transform hover:scale-[1.02] mt-2 uppercase tracking-wide">
+                                Tìm Kiếm Vé
+                            </button>
+                        </form>
                     </div>
                 </div>
 
-                <div class="w-full md:w-[55%] mt-12 md:mt-0 text-white md:pl-8">
+                <div class="flex flex-col space-y-6 h-full">
 
-                    <div class="swiper phone-slider mb-6 h-96">
+                    <div class="bg-white/10 backdrop-blur-md rounded-xl p-0 shadow-2xl border border-white/20 flex flex-col h-full overflow-hidden">
 
-                        <div class="swiper-wrapper">
+                        <div class="p-4 bg-black/20 border-b border-white/10 flex-shrink-0">
+                            <h3 class="text-xl font-bold text-white flex items-center justify-between">
+                                <span class="flex items-center">
+                                    <svg class="w-8 h-8 mr-3 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+                                    Thời Tiết Hôm Nay
+                                </span>
+                                <span class="text-xs font-normal bg-white/20 px-2 py-1 rounded-full text-white/80">
+                                    {{ count($weatherData) }} địa điểm
+                                </span>
+                            </h3>
+                        </div>
 
-                            <div class="swiper-slide flex justify-center items-center">
-                                <img src="/images/app-ve-web.jpg" alt="App screenshot" class="h-80 object-contain drop-shadow-lg">
-                            </div>
+                        {{--
+                            max-h-[400px]: Giới hạn chiều cao
+                            overflow-y-auto: Hiện thanh cuộn khi danh sách dài
+                            custom-scrollbar: Style thanh cuộn đẹp (CSS bên dưới)
+                        --}}
+                        <div class="p-4 space-y-3 flex-grow overflow-y-auto custom-scrollbar" style="max-height: 250px;">
+                            @foreach($weatherData as $city => $data)
+                                @php
+                                    // Xử lý tên hiển thị cho đẹp
+                                    $displayName = $city;
+                                    if($city == 'Ho Chi Minh City') $displayName = 'TP. Hồ Chí Minh';
+                                    elseif($city == 'Hanoi') $displayName = 'Hà Nội';
+                                    elseif($city == 'Da Nang') $displayName = 'Đà Nẵng';
+                                @endphp
 
-                            <div class="swiper-slide flex justify-center items-center">
-                                <img src="/images/baseus-ve-web.jpg" alt="App screenshot 2" class="h-80 object-contain drop-shadow-lg">
-                            </div>
+                                <div class="flex items-center justify-between bg-black/30 p-3 rounded-xl hover:bg-white/20 transition duration-200 border border-transparent hover:border-white/30 group">
+                                    <div class="flex items-center min-w-0">
+                                        <img src="http://openweathermap.org/img/wn/{{ $data['weather'][0]['icon'] ?? '01d' }}.png"
+                                            class="w-10 h-10 mr-3 filter drop-shadow-md group-hover:scale-110 transition-transform">
+                                        <div class="truncate pr-2">
+                                            <h4 class="font-bold text-white text-base truncate" title="{{ $displayName }}">
+                                                {{ $displayName }}
+                                            </h4>
+                                            <p class="text-[11px] text-gray-300 capitalize truncate">
+                                                {{ $data['weather'][0]['description'] ?? '--' }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right flex-shrink-0">
+                                        <span class="block text-2xl font-bold text-yellow-300 leading-none">
+                                            {{ round($data['main']['temp'] ?? 0) }}°
+                                        </span>
+                                        <span class="text-[10px] text-gray-400 block mt-1">
+                                            H:{{ $data['main']['humidity'] ?? 0 }}%
+                                        </span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
 
-                            </div>
-
-                        <div class="swiper-pagination"></div>
+                        <div class="p-3 bg-black/20 text-center flex-shrink-0 border-t border-white/10">
+                            <p class="text-[10px] text-gray-400 italic flex items-center justify-center gap-1">
+                                <span>●</span> Dữ liệu thực tế từ OpenWeather
+                            </p>
+                        </div>
                     </div>
 
-                    <h2 class="text-4xl font-bold text-white text-center md:text-left" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
-                        Sanvemaybay.vn
-                    </h2>
+                    {{-- CSS thanh cuộn (Chỉ áp dụng trong widget này) --}}
+                    <style>
+                        .custom-scrollbar::-webkit-scrollbar {
+                            width: 6px;
+                        }
+                        .custom-scrollbar::-webkit-scrollbar-track {
+                            background: rgba(0, 0, 0, 0.1);
+                            border-radius: 10px;
+                            margin: 4px;
+                        }
+                        .custom-scrollbar::-webkit-scrollbar-thumb {
+                            background: rgba(255, 255, 255, 0.2);
+                            border-radius: 10px;
+                        }
+                        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                            background: rgba(255, 255, 255, 0.4);
+                        }
+                    </style>
 
-                    <p class="mt-4 text-gray-100 text-base leading-relaxed bg-black bg-opacity-30 p-4 rounded-lg shadow-inner">
-                        Hệ thống săn vé máy bay giá rẻ Vietjet, Vietnam Airlines, Bamboo, Pacific, Vietravel.
-                        Tìm vé đặt vé máy bay online, tìm vé rẻ nhất hệ thống, so sánh giá vé từ hơn
-                        200 hãng hàng không quốc tế và nội địa. Hình thức thanh toán linh hoạt qua internet
-                        banking, Visa, Master. Đặt vé máy bay online - Giao vé tận nhà. Đội ngũ booker
-                        chuyên nghiệp, tận tâm phục vụ, uy tín, chu đáo, hỗ trợ 24/7.
-                    </p>
+
+                    <div class="bg-gray-900/80 backdrop-blur-sm rounded-xl p-6 shadow-2xl border-l-4 border-blue-500 text-white">
+                        <h3 class="text-xl font-bold mb-2 text-blue-400">Sanvemaybay.vn</h3>
+                        <p class="text-xs text-gray-300 leading-relaxed">
+                            Hệ thống săn vé máy bay giá rẻ Vietjet, Vietnam Airlines, Bamboo, Pacific, Vietravel.
+                            Tìm vé đặt vé máy bay online, tìm vé rẻ nhất hệ thống, so sánh giá vé từ hơn 200 hãng hàng không quốc tế và nội địa.
+                            Hình thức thanh toán linh hoạt qua internet banking, Visa, Master. Giao vé tận nhà.
+                            Đội ngũ booker chuyên nghiệp, tận tâm phục vụ, uy tín, chu đáo, hỗ trợ 24/7.
+                        </p>
+                    </div>
 
                 </div>
-            </div>
+                </div>
         </div>
     </div>
 
