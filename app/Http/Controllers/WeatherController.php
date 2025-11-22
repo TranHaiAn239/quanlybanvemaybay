@@ -11,7 +11,7 @@ class WeatherController extends Controller
     {
         // Dùng Cache để tránh gọi API quá nhiều (60 phút)
         return Cache::remember("weather_{$city}", 3600, function () use ($city) {
-            $apiKey = '1f590b09189fd403abc0e8ad92074e33'; // <-- DÁN API KEY CỦA BẠN VÀO ĐÂY (Lấy từ OpenWeatherMap)
+            $apiKey = '4669701558d949968e56323121031'; // <-- DÁN API KEY CỦA BẠN VÀO ĐÂY (Lấy từ OpenWeatherMap)
             // Nếu chưa có key, dùng key test tạm thời này (nhưng nên dùng key của bạn):
             // 4669701558d949968e563231210310 (Ví dụ)
 
