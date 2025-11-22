@@ -259,6 +259,7 @@ class BookingController extends Controller
                 'giam_gia' => $tong_giam_gia,
                 'trang_thai' => 'cho_thanh_toan',
                 'phuong_thuc_tt' => 'khong',
+                'ip_address' => $request->ip(),
             ]);
 
             // Tạo Vé và Thông tin người đi
